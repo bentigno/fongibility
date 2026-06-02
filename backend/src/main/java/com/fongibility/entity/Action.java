@@ -42,7 +42,7 @@ public class Action {
     private String nipCode;
     private LocalDateTime dateModification;
     
-    @OneToMany(mappedBy = "action", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private Set<Action> subActions = new HashSet<>();
     
     @OneToMany(mappedBy = "action", cascade = CascadeType.ALL)
