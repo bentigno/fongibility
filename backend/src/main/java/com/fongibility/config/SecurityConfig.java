@@ -45,18 +45,22 @@ public class SecurityConfig {
         @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Activer et configurer le CORS en tout premier
+                                // 1. Activer et configurer le CORS pour accepter toutes vos branches Vercel
                 .cors(cors -> cors.configurationSource(request -> {
                     org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
-                    config.setAllowedOrigins(java.util.List.of(
+                    
+                    // Autorise l'URL principale et accepte les patterns dynamiques de Vercel
+                    config.setAllowedOriginPatterns(java.util.List.of(
                         "https://vercel.app",
-                        "https://vercel.app"
+                        "https://fongibility-*.vercel.app" // Autorise n'importe quelle URL de build Vercel
                     ));
+                    
                     config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(java.util.List.of("*"));
                     config.setAllowCredentials(true);
                     return config;
                 }))
+
                 // 2. Le reste de votre configuration actuelle reste identique
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
