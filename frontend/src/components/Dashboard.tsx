@@ -42,6 +42,7 @@ export function Dashboard() {
   const roles = user?.roles || [];
   const isOperateur = roles.includes('OPERATEUR_SAISIE') || roles.includes('ADMIN');
   const isResponsable = roles.includes('RESPONSABLE_FONCTION');
+  const [showOperatorMenu, setShowOperatorMenu] = useState<boolean>(isOperateur);
 
   return (
     <div style={styles.container}>
@@ -49,13 +50,20 @@ export function Dashboard() {
         <div>
           <h1>Fongibility - Gestion des Transactions</h1>
           <p>Section: {user?.sectionLibelle}</p>
-          <p>Utilisateur: {user?.username} ({user?.roles.join(', ')})</p>
+          <p>Utilisateur: {user?.username} ({Array.isArray(user?.roles) ? user.roles.join(', ') : String(user?.roles)})</p>
         </div>
-        <button onClick={handleLogout} style={styles.logoutBtn}>Déconnexion</button>
+        <div style={{display:'flex', gap:8, alignItems:'center'}}>
+          {!isOperateur && (
+            <button onClick={() => setShowOperatorMenu(!showOperatorMenu)} style={styles.smallBtn}>
+              {showOperatorMenu ? 'Masquer menu op.' : 'Afficher menu op.'}
+            </button>
+          )}
+          <button onClick={handleLogout} style={styles.logoutBtn}>Déconnexion</button>
+        </div>
       </header>
 
       <div style={styles.content}>
-        {isOperateur && (
+        {showOperatorMenu && (
           <div style={styles.section}>
             <h2>Opérateur de saisie</h2>
             <div style={styles.menu}>
@@ -203,6 +211,14 @@ const styles = {
   logoutBtn: {
     padding: '10px 20px',
     backgroundColor: '#dc3545',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+  },
+  smallBtn: {
+    padding: '8px 12px',
+    backgroundColor: '#6c757d',
     color: 'white',
     border: 'none',
     borderRadius: '4px',
