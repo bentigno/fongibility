@@ -133,125 +133,163 @@ export function TransactionForm() {
   const totalDebit = debitLines.reduce((sum, line) => sum + line.montantCP, 0);
   const totalCredit = creditLines.reduce((sum, line) => sum + line.montantCP, 0);
 
+  const currentDate = new Date().toLocaleDateString('fr-FR');
+
   return (
     <div style={styles.container}>
-      <h2>Saisie de Transaction</h2>
-      <div style={styles.headerArea}>
-        <div style={styles.fieldRow}>
-          <label style={styles.label}>N° acte :</label>
-          <input style={styles.inputShort} value={acteNumber} onChange={(e) => setActeNumber(e.target.value)} />
-          <label style={{...styles.label, marginLeft:16}}>Exercice :</label>
-          <select value={exercice} onChange={(e) => setExercice(Number(e.target.value))}>
-            {Array.from({length:5}).map((_,i)=>{
-              const y = new Date().getFullYear()-2 + i;
-              return <option key={y} value={y}>{y}</option>
-            })}
-          </select>
+      <div style={styles.topBar}>
+        <div style={styles.topBarLeft}>
+          <div><strong>Prénoms & Nom</strong> : {user?.fullName || 'N/A'}</div>
+          <div><strong>Code</strong> : {user?.code || 'OPSCM50010'}</div>
+          <div><strong>Fonction</strong> : OPÉRATEUR DE SAISIE DU BUDGET DU MINISTÈRE</div>
         </div>
-
-        <div style={styles.fieldRow}>
-          <label style={styles.label}>Libellé :</label>
-          <input style={{...styles.input, flex:1}} value={libelle} onChange={(e)=>setLibelle(e.target.value)} />
-        </div>
-
-        <div style={styles.fieldRow}>
-          <label style={styles.label}>Section :</label>
-          <strong style={{marginRight:12}}>{user?.sectionLibelle}</strong>
-          <label style={{...styles.label, marginLeft:12}}>Source fin. :</label>
-          <select value={sourceFin} onChange={(e)=>setSourceFin(e.target.value)}>
-            <option>Fonds propres</option>
-            <option>Budget extérieur</option>
-          </select>
-          <label style={{...styles.label, marginLeft:12}}>Bailleur :</label>
-          <select value={bailleur} onChange={(e)=>setBailleur(e.target.value)}>
-            <option>Etat</option>
-            <option>Banque</option>
-          </select>
+        <div style={styles.topBarRight}>
+          <div><strong>Ministère</strong> : Ministère de l'Education Nationale</div>
+          <div><strong>Date</strong> : {currentDate}</div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <div style={styles.section}>
-          <h3>Débit</h3>
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th>Groupe</th>
-                <th>Programme</th>
-                <th>Catégorie</th>
-                <th>Chapitre</th>
-                <th>Montant AE</th>
-                <th>Montant CP</th>
-              </tr>
-            </thead>
-            <tbody>
-              {debitLines.map((line, idx) => (
-                <tr key={idx}>
-                  <td><input type="number" value={line.groupe} onChange={(e) => {
-                    const newLines = [...debitLines];
-                    newLines[idx].groupe = Number(e.target.value);
-                    setDebitLines(newLines);
-                  }} style={styles.input} /></td>
-                  <td><input type="text" value={line.programme} style={styles.input} /></td>
-                  <td><input type="text" value={line.categorie} style={styles.input} /></td>
-                  <td><input type="text" value={line.chapitre} style={styles.input} /></td>
-                  <td><input type="number" value={line.montantAE} style={styles.input} /></td>
-                  <td><input type="number" value={line.montantCP} onChange={(e) => {
-                    const newLines = [...debitLines];
-                    newLines[idx].montantCP = Number(e.target.value);
-                    setDebitLines(newLines);
-                  }} style={styles.input} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button type="button" onClick={handleAddDebitLine} style={styles.btnAdd}>Ajouter ligne</button>
-          <p style={styles.total}>Total CP: {totalDebit}</p>
+      <div style={styles.formCard}>
+        <div style={styles.acteHeader}>
+          <div style={styles.acteTitle}>Acte rectificatif</div>
+          <div style={styles.fieldRow}>
+            <label style={styles.label}>N° acte :</label>
+            <input style={styles.inputShort} value={acteNumber} onChange={(e) => setActeNumber(e.target.value)} />
+            <label style={{...styles.label, marginLeft: 16}}>Exercice :</label>
+            <select value={exercice} onChange={(e) => setExercice(Number(e.target.value))} style={styles.selectShort}>
+              {Array.from({length: 5}).map((_, i) => {
+                const y = new Date().getFullYear() - 2 + i;
+                return <option key={y} value={y}>{y}</option>;
+              })}
+            </select>
+          </div>
+
+          <div style={styles.fieldRow}>
+            <label style={styles.label}>Libellé :</label>
+            <input style={{...styles.input, flex: 1}} value={libelle} onChange={(e) => setLibelle(e.target.value)} />
+          </div>
+
+          <div style={styles.fieldRow}>
+            <label style={styles.label}>Section :</label>
+            <span style={styles.readonlyField}>{user?.sectionLibelle || 'Section'}</span>
+            <label style={{...styles.label, marginLeft: 16}}>Source fin. :</label>
+            <select value={sourceFin} onChange={(e) => setSourceFin(e.target.value)} style={styles.selectShort}>
+              <option>Fonds propres</option>
+              <option>Budget extérieur</option>
+            </select>
+            <label style={{...styles.label, marginLeft: 16}}>Bailleur :</label>
+            <select value={bailleur} onChange={(e) => setBailleur(e.target.value)} style={styles.selectShort}>
+              <option>Etat</option>
+              <option>Banque</option>
+            </select>
+          </div>
         </div>
 
-        <div style={styles.section}>
-          <h3>Crédit</h3>
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th>Groupe</th>
-                <th>Programme</th>
-                <th>Catégorie</th>
-                <th>Chapitre</th>
-                <th>Montant AE</th>
-                <th>Montant CP</th>
-              </tr>
-            </thead>
-            <tbody>
-              {creditLines.map((line, idx) => (
-                <tr key={idx}>
-                  <td><input type="number" value={line.groupe} style={styles.input} /></td>
-                  <td><input type="text" value={line.programme} style={styles.input} /></td>
-                  <td><input type="text" value={line.categorie} style={styles.input} /></td>
-                  <td><input type="text" value={line.chapitre} style={styles.input} /></td>
-                  <td><input type="number" value={line.montantAE} style={styles.input} /></td>
-                  <td><input type="number" value={line.montantCP} onChange={(e) => {
-                    const newLines = [...creditLines];
-                    newLines[idx].montantCP = Number(e.target.value);
-                    setCreditLines(newLines);
-                  }} style={styles.input} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button type="button" onClick={handleAddCreditLine} style={styles.btnAdd}>Ajouter ligne</button>
-          <p style={styles.total}>Total CP: {totalCredit}</p>
-        </div>
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <div style={styles.doubleSection}>
+            <div style={styles.sectionBox}>
+              <div style={styles.sectionHeader}>Débit</div>
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Groupe</th>
+                    <th>Prog.</th>
+                    <th>Categ. dep.</th>
+                    <th>Montant AE</th>
+                    <th>Montant CP</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {debitLines.map((line, idx) => (
+                    <tr key={idx}>
+                      <td><input type="number" value={line.groupe} onChange={(e) => {
+                        const newLines = [...debitLines];
+                        newLines[idx].groupe = Number(e.target.value);
+                        setDebitLines(newLines);
+                      }} style={styles.input} /></td>
+                      <td><div style={styles.inputWithButton}><input type="text" value={line.programme} style={styles.input} /><button type="button" style={styles.ellipsisBtn}>...</button></div></td>
+                      <td><input type="text" value={line.categorie} style={styles.input} /></td>
+                      <td><input type="number" value={line.montantAE} onChange={(e) => {
+                        const newLines = [...debitLines];
+                        newLines[idx].montantAE = Number(e.target.value);
+                        setDebitLines(newLines);
+                      }} style={styles.input} /></td>
+                      <td><input type="number" value={line.montantCP} onChange={(e) => {
+                        const newLines = [...debitLines];
+                        newLines[idx].montantCP = Number(e.target.value);
+                        setDebitLines(newLines);
+                      }} style={styles.input} /></td>
+                      <td><button type="button" onClick={() => {
+                        setDebitLines(debitLines.filter((_, i) => i !== idx));
+                      }} style={styles.deleteCellBtn}>X</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div style={styles.totalRow}>
+                <span>Total :</span>
+                <input style={styles.totalInput} value={totalDebit} readOnly />
+              </div>
+              <div style={styles.sectionFooter}>Prog.</div>
+            </div>
 
-        <div style={styles.buttonGroup}>
-          <button type="submit" disabled={loading} style={styles.btnSubmit}>
-            {loading ? 'Enregistrement...' : 'Enregistrer Transaction'}
-          </button>
-          <button type="button" onClick={handleNew} style={styles.btnSecondary}>Nouveau</button>
-          <button type="button" onClick={handleDelete} style={styles.btnSecondaryDanger}>Supprimer</button>
-          <button type="button" onClick={handleQuit} style={styles.btnSecondary}>Quitter</button>
-        </div>
-      </form>
+            <div style={styles.sectionBox}>
+              <div style={styles.sectionHeader}>Crédit</div>
+              <table style={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Groupe</th>
+                    <th>Prog.</th>
+                    <th>Categ. dep.</th>
+                    <th>Montant AE</th>
+                    <th>Montant CP</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {creditLines.map((line, idx) => (
+                    <tr key={idx}>
+                      <td><input type="number" value={line.groupe} onChange={(e) => {
+                        const newLines = [...creditLines];
+                        newLines[idx].groupe = Number(e.target.value);
+                        setCreditLines(newLines);
+                      }} style={styles.input} /></td>
+                      <td><div style={styles.inputWithButton}><input type="text" value={line.programme} style={styles.input} /><button type="button" style={styles.ellipsisBtn}>...</button></div></td>
+                      <td><input type="text" value={line.categorie} style={styles.input} /></td>
+                      <td><input type="number" value={line.montantAE} onChange={(e) => {
+                        const newLines = [...creditLines];
+                        newLines[idx].montantAE = Number(e.target.value);
+                        setCreditLines(newLines);
+                      }} style={styles.input} /></td>
+                      <td><input type="number" value={line.montantCP} onChange={(e) => {
+                        const newLines = [...creditLines];
+                        newLines[idx].montantCP = Number(e.target.value);
+                        setCreditLines(newLines);
+                      }} style={styles.input} /></td>
+                      <td><button type="button" onClick={() => {
+                        setCreditLines(creditLines.filter((_, i) => i !== idx));
+                      }} style={styles.deleteCellBtn}>X</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div style={styles.totalRow}>
+                <span>Total :</span>
+                <input style={styles.totalInput} value={totalCredit} readOnly />
+              </div>
+              <div style={styles.sectionFooter}>Prog.</div>
+            </div>
+          </div>
+
+          <div style={styles.primaryButtonRow}>
+            <button type="submit" disabled={loading} style={styles.btnSubmit}>{loading ? 'Enregistrement...' : 'Enregistrer'}</button>
+            <button type="button" onClick={handleNew} style={styles.btnSecondary}>Nouveau</button>
+            <button type="button" onClick={handleDelete} style={styles.btnSecondaryDanger}>Supprimer</button>
+            <button type="button" onClick={handleQuit} style={styles.btnSecondary}>Quitter</button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
@@ -349,5 +387,119 @@ const styles = {
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
+  },
+  topBar: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    backgroundColor: '#1f3f93',
+    color: 'white',
+    padding: '14px 20px',
+    borderRadius: '8px',
+    marginBottom: '20px',
+  },
+  topBarLeft: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '6px',
+  },
+  topBarRight: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '6px',
+    textAlign: 'right' as const,
+  },
+  formCard: {
+    border: '1px solid #ccc',
+    borderRadius: '8px',
+    padding: '18px',
+    backgroundColor: '#fefefe',
+  },
+  acteHeader: {
+    border: '1px solid #b0b0b0',
+    borderRadius: '8px',
+    padding: '16px',
+    marginBottom: '20px',
+    backgroundColor: '#f8f9fa',
+  },
+  acteTitle: {
+    fontSize: '16px',
+    fontWeight: 700 as const,
+    marginBottom: '12px',
+  },
+  selectShort: {
+    width: '120px',
+    padding: '6px',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+  },
+  readonlyField: {
+    padding: '8px 12px',
+    backgroundColor: '#fff',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+  },
+  doubleSection: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '20px',
+  },
+  sectionBox: {
+    border: '1px solid #b0b0b0',
+    borderRadius: '8px',
+    padding: '16px',
+    backgroundColor: '#fdfdfd',
+  },
+  sectionHeader: {
+    fontWeight: 700 as const,
+    marginBottom: '12px',
+  },
+  inputWithButton: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+  },
+  ellipsisBtn: {
+    width: '36px',
+    height: '34px',
+    border: '1px solid #ced4da',
+    borderRadius: '4px',
+    backgroundColor: '#e9ecef',
+    cursor: 'pointer',
+  },
+  deleteCellBtn: {
+    width: '32px',
+    height: '32px',
+    border: '1px solid #dee2e6',
+    borderRadius: '4px',
+    backgroundColor: '#f8d7da',
+    color: '#721c24',
+    cursor: 'pointer',
+  },
+  totalRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: '10px',
+    marginTop: '10px',
+  },
+  totalInput: {
+    width: '140px',
+    padding: '8px',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    textAlign: 'right' as const,
+    backgroundColor: '#e9ecef',
+  },
+  sectionFooter: {
+    marginTop: '12px',
+    padding: '8px 12px',
+    borderTop: '1px solid #ddd',
+    color: '#495057',
+  },
+  primaryButtonRow: {
+    display: 'flex',
+    gap: '12px',
+    justifyContent: 'flex-end',
+    flexWrap: 'wrap' as const,
   },
 };
