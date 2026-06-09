@@ -9,6 +9,7 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD:}
 
   jpa:
+    defer-datasource-initialization: true # Force l'exécution du script SQL après la création des tables
     database-platform: ${SPRING_JPA_DIALECT:org.hibernate.dialect.H2Dialect}
     hibernate:
       ddl-auto: ${SPRING_JPA_DDL_AUTO:create-drop}
