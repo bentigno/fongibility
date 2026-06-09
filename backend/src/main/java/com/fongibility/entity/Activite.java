@@ -34,6 +34,7 @@ public class Activite {
     
     private LocalDateTime dateModification;
     
+    @Builder.Default
     @OneToMany(mappedBy = "activite", cascade = CascadeType.ALL)
     private Set<Transaction> transactions = new HashSet<>();
 }

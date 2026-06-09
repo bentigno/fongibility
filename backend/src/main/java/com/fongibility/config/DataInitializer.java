@@ -52,26 +52,7 @@ public class DataInitializer implements CommandLineRunner {
             initializeData();
         }
     }
-@Bean
-    CommandLineRunner initDatabase(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        return args -> {
-            // Insère l'utilisateur operateur1 uniquement si la table est vide
-            if (userRepository.findByUsername("operateur1").isEmpty()) {
-                User user = new User();
-                user.setUsername("operateur1");
-                // Encode le mot de passe pour que Spring Security puisse le lire
-                user.setPassword(passwordEncoder.encode("password")); 
-                user.setEmail("operateur1@fongibility.com");
-                
-                // ⚠️ Si votre classe User possède des champs obligatoires (comme des rôles),
-                // décommentez et adaptez la ligne suivante :
-                user.setRoles(java.util.List.of("OPERATEUR_SAISIE"));
 
-                userRepository.save(user);
-                System.out.println("✓ Utilisateur operateur1 créé avec succès dans PostgreSQL !");
-            }
-        };
-    }
     private void initializeData() {
         // Créer les rôles
         Role roleOperateur = new Role();

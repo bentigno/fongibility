@@ -42,12 +42,15 @@ public class Action {
     private String nipCode;
     private LocalDateTime dateModification;
     
+    @Builder.Default
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private Set<Action> subActions = new HashSet<>();
     
+    @Builder.Default
     @OneToMany(mappedBy = "action", cascade = CascadeType.ALL)
     private Set<Activite> activites = new HashSet<>();
     
+    @Builder.Default
     @OneToMany(mappedBy = "action", cascade = CascadeType.ALL)
     private Set<Transaction> transactions = new HashSet<>();
 }

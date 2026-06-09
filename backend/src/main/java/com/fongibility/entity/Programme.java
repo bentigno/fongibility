@@ -42,9 +42,11 @@ public class Programme {
     private LocalDateTime dateModification;
     private LocalDateTime dateActualisation;
     
+    @Builder.Default
     @OneToMany(mappedBy = "programme", cascade = CascadeType.ALL)
     private Set<Action> actions = new HashSet<>();
     
+    @Builder.Default
     @OneToMany(mappedBy = "programme", cascade = CascadeType.ALL)
     private Set<Transaction> transactions = new HashSet<>();
 }

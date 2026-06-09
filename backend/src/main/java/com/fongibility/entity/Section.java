@@ -33,12 +33,15 @@ public class Section {
     private Boolean valide;
     private String type;
     
+    @Builder.Default
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL)
     private Set<Programme> programmes = new HashSet<>();
     
+    @Builder.Default
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL)
     private Set<Chapitre> chapitres = new HashSet<>();
     
+    @Builder.Default
     @OneToMany(mappedBy = "section", cascade = CascadeType.ALL)
     private Set<Transaction> transactions = new HashSet<>();
 }
