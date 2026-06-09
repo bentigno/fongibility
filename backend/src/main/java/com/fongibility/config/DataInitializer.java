@@ -65,7 +65,7 @@ public class DataInitializer implements CommandLineRunner {
                 
                 // ⚠️ Si votre classe User possède des champs obligatoires (comme des rôles),
                 // décommentez et adaptez la ligne suivante :
-                // user.setRoles(java.util.List.of("ROLE_OPERATEUR"));
+                user.setRoles(java.util.List.of("OPERATEUR_SAISIE"));
 
                 userRepository.save(user);
                 System.out.println("✓ Utilisateur operateur1 créé avec succès dans PostgreSQL !");
