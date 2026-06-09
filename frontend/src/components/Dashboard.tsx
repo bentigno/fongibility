@@ -39,8 +39,9 @@ export function Dashboard() {
     navigate('/login');
   };
 
-  const isOperateur = user?.roles.includes('OPERATEUR_SAISIE');
-  const isResponsable = user?.roles.includes('RESPONSABLE_FONCTION');
+  const roles = user?.roles || [];
+  const isOperateur = roles.includes('OPERATEUR_SAISIE') || roles.includes('ADMIN');
+  const isResponsable = roles.includes('RESPONSABLE_FONCTION');
 
   return (
     <div style={styles.container}>
