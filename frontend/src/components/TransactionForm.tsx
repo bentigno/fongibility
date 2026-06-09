@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import apiClient from '../api/ApiClient';
 
@@ -16,8 +17,14 @@ interface TransactionLine {
 
 export function TransactionForm() {
   const user = useAuthStore((state) => state.user);
+  const navigate = useNavigate();
   const [debitLines, setDebitLines] = useState<TransactionLine[]>([]);
   const [creditLines, setCreditLines] = useState<TransactionLine[]>([]);
+  const [acteNumber, setActeNumber] = useState<string>('');
+  const [exercice, setExercice] = useState<number>(new Date().getFullYear());
+  const [libelle, setLibelle] = useState<string>('');
+  const [sourceFin, setSourceFin] = useState<string>('Fonds propres');
+  const [bailleur, setBailleur] = useState<string>('Etat');
   const [programmes, setProgrammes] = useState<any[]>([]);
   const [actions, setActions] = useState<any[]>([]);
   const [activites, setActivites] = useState<any[]>([]);
@@ -81,8 +88,12 @@ export function TransactionForm() {
 
       // Créer la transaction
       const transaction = {
-        exercice: new Date().getFullYear(),
+        exercice: exercice,
         sectionId: user?.sectionId,
+        acteNumber,
+        libelle,
+        sourceFin,
+        bailleur,
         // Ajouter les lignes de débit et crédit
         typeTransactionDebit: 'DEBIT',
         typeTransactionCredit: 'CREDIT',
@@ -94,11 +105,29 @@ export function TransactionForm() {
       // Reset form
       setDebitLines([]);
       setCreditLines([]);
+      setActeNumber('');
+      setLibelle('');
     } catch (err: any) {
       alert('Erreur lors de la création de la transaction');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleNew = () => {
+    setDebitLines([]);
+    setCreditLines([]);
+    setActeNumber('');
+    setLibelle('');
+  };
+
+  const handleDelete = async () => {
+    if (!confirm('Confirmez-vous la suppression de cette transaction (placeholder) ?')) return;
+    alert('Suppression non implémentée (placeholder)');
+  };
+
+  const handleQuit = () => {
+    navigate('/');
   };
 
   const totalDebit = debitLines.reduce((sum, line) => sum + line.montantCP, 0);
@@ -107,7 +136,39 @@ export function TransactionForm() {
   return (
     <div style={styles.container}>
       <h2>Saisie de Transaction</h2>
-      <p>Section: <strong>{user?.sectionLibelle}</strong></p>
+      <div style={styles.headerArea}>
+        <div style={styles.fieldRow}>
+          <label style={styles.label}>N° acte :</label>
+          <input style={styles.inputShort} value={acteNumber} onChange={(e) => setActeNumber(e.target.value)} />
+          <label style={{...styles.label, marginLeft:16}}>Exercice :</label>
+          <select value={exercice} onChange={(e) => setExercice(Number(e.target.value))}>
+            {Array.from({length:5}).map((_,i)=>{
+              const y = new Date().getFullYear()-2 + i;
+              return <option key={y} value={y}>{y}</option>
+            })}
+          </select>
+        </div>
+
+        <div style={styles.fieldRow}>
+          <label style={styles.label}>Libellé :</label>
+          <input style={{...styles.input, flex:1}} value={libelle} onChange={(e)=>setLibelle(e.target.value)} />
+        </div>
+
+        <div style={styles.fieldRow}>
+          <label style={styles.label}>Section :</label>
+          <strong style={{marginRight:12}}>{user?.sectionLibelle}</strong>
+          <label style={{...styles.label, marginLeft:12}}>Source fin. :</label>
+          <select value={sourceFin} onChange={(e)=>setSourceFin(e.target.value)}>
+            <option>Fonds propres</option>
+            <option>Budget extérieur</option>
+          </select>
+          <label style={{...styles.label, marginLeft:12}}>Bailleur :</label>
+          <select value={bailleur} onChange={(e)=>setBailleur(e.target.value)}>
+            <option>Etat</option>
+            <option>Banque</option>
+          </select>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} style={styles.form}>
         <div style={styles.section}>
@@ -186,6 +247,9 @@ export function TransactionForm() {
           <button type="submit" disabled={loading} style={styles.btnSubmit}>
             {loading ? 'Enregistrement...' : 'Enregistrer Transaction'}
           </button>
+          <button type="button" onClick={handleNew} style={styles.btnSecondary}>Nouveau</button>
+          <button type="button" onClick={handleDelete} style={styles.btnSecondaryDanger}>Supprimer</button>
+          <button type="button" onClick={handleQuit} style={styles.btnSecondary}>Quitter</button>
         </div>
       </form>
     </div>
@@ -246,5 +310,44 @@ const styles = {
     cursor: 'pointer',
     fontSize: '16px',
     fontWeight: 'bold' as const,
+  },
+  headerArea: {
+    border: '1px solid #ccc',
+    padding: '12px',
+    borderRadius: '6px',
+    marginBottom: '16px',
+    backgroundColor: '#fafafa',
+  },
+  fieldRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    marginBottom: '8px',
+  },
+  label: {
+    minWidth: '80px',
+    fontWeight: 600,
+  },
+  inputShort: {
+    width: '140px',
+    padding: '6px',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+  },
+  btnSecondary: {
+    padding: '10px 16px',
+    backgroundColor: '#6c757d',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+  },
+  btnSecondaryDanger: {
+    padding: '10px 16px',
+    backgroundColor: '#dc3545',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
   },
 };

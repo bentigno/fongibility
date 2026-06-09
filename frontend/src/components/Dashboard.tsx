@@ -7,6 +7,7 @@ import { TransactionForm } from './TransactionForm';
 export function Dashboard() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
+  const [opMode, setOpMode] = useState<'saisie' | 'consultation' | 'transmission'>('saisie');
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -55,8 +56,49 @@ export function Dashboard() {
       <div style={styles.content}>
         {isOperateur && (
           <div style={styles.section}>
-            <h2>Nouvelle Transaction</h2>
-            <TransactionForm />
+            <h2>Opérateur de saisie</h2>
+            <div style={styles.menu}>
+              <button
+                style={opMode === 'saisie' ? styles.menuBtnActive : styles.menuBtn}
+                onClick={() => setOpMode('saisie')}
+              >
+                Saisie - Mise à jour
+              </button>
+              <button
+                style={opMode === 'consultation' ? styles.menuBtnActive : styles.menuBtn}
+                onClick={() => setOpMode('consultation')}
+              >
+                Consultation - Édition
+              </button>
+              <button
+                style={opMode === 'transmission' ? styles.menuBtnActive : styles.menuBtn}
+                onClick={() => setOpMode('transmission')}
+              >
+                Transmission
+              </button>
+            </div>
+
+            {opMode === 'saisie' && (
+              <div>
+                <h3>Saisie / Mise à jour</h3>
+                <TransactionForm />
+              </div>
+            )}
+
+            {opMode === 'consultation' && (
+              <div>
+                <h3>Consultation / Édition</h3>
+                <p>Consultez et éditez les transactions existantes ci-dessous.</p>
+                {/* Réutilise la table d'historique plus bas ou ajouter un composant d'édition */}
+              </div>
+            )}
+
+            {opMode === 'transmission' && (
+              <div>
+                <h3>Transmission</h3>
+                <p>Gérez la transmission des transactions vers l'entité suivante.</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -131,6 +173,26 @@ const styles = {
     borderRadius: '8px',
     marginBottom: '20px',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+  },
+  menu: {
+    display: 'flex',
+    gap: '10px',
+    marginBottom: '15px',
+  },
+  menuBtn: {
+    padding: '8px 12px',
+    backgroundColor: '#e9ecef',
+    border: '1px solid #ced4da',
+    borderRadius: '6px',
+    cursor: 'pointer',
+  },
+  menuBtnActive: {
+    padding: '8px 12px',
+    backgroundColor: '#007bff',
+    color: 'white',
+    border: '1px solid #007bff',
+    borderRadius: '6px',
+    cursor: 'pointer',
   },
   table: {
     width: '100%',
