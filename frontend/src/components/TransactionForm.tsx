@@ -340,144 +340,146 @@ export function TransactionForm() {
                 <div>Action</div>
               </div>
               {debitLines.map((line, idx) => (
-                <div key={idx} style={styles.tableRow}>
-                  <input
-                    type="number"
-                    value={line.groupe}
-                    onChange={(e) => {
-                      const newLines = [...debitLines];
-                      newLines[idx].groupe = Number(e.target.value);
-                      setDebitLines(newLines);
-                    }}
-                    style={styles.cellInput}
-                    placeholder="Groupe"
-                  />
-                  <div style={styles.inputWithButton}>
+                <React.Fragment key={idx}>
+                  <div style={styles.tableRow}>
+                    <input
+                      type="number"
+                      value={line.groupe}
+                      onChange={(e) => {
+                        const newLines = [...debitLines];
+                        newLines[idx].groupe = Number(e.target.value);
+                        setDebitLines(newLines);
+                      }}
+                      style={styles.cellInput}
+                      placeholder="Groupe"
+                    />
+                    <div style={styles.inputWithButton}>
+                      <select
+                        value={line.programmeId ?? ''}
+                        onChange={async (e) => {
+                          const programmeId = e.target.value ? Number(e.target.value) : null;
+                          await handleProgrammeChange(idx, true, programmeId);
+                        }}
+                        style={styles.cellInput}
+                      >
+                        <option value="">Sélectionner</option>
+                        {programmes.map((programme) => (
+                          <option key={programme.id} value={programme.id}>
+                            {programme.libelle}
+                          </option>
+                        ))}
+                      </select>
+                      <button type="button" style={styles.ellipsisBtn}>...</button>
+                    </div>
                     <select
-                      value={line.programmeId ?? ''}
+                      value={line.categorieId ?? ''}
                       onChange={async (e) => {
-                        const programmeId = e.target.value ? Number(e.target.value) : null;
-                        await handleProgrammeChange(idx, true, programmeId);
+                        const categorieId = e.target.value ? Number(e.target.value) : null;
+                        await handleCategoryChange(idx, true, categorieId);
                       }}
                       style={styles.cellInput}
                     >
                       <option value="">Sélectionner</option>
-                      {programmes.map((programme) => (
-                        <option key={programme.id} value={programme.id}>
-                          {programme.libelle}
+                      {categories.map((categorie) => (
+                        <option key={categorie.id} value={categorie.id}>
+                          {categorie.libelle}
                         </option>
                       ))}
                     </select>
-                    <button type="button" style={styles.ellipsisBtn}>...</button>
+                    <input
+                      type="number"
+                      value={line.montantAE}
+                      onChange={(e) => {
+                        const newLines = [...debitLines];
+                        newLines[idx].montantAE = Number(e.target.value);
+                        setDebitLines(newLines);
+                      }}
+                      style={styles.cellInput}
+                      placeholder="0"
+                    />
+                    <input
+                      type="number"
+                      value={line.montantCP}
+                      onChange={(e) => {
+                        const newLines = [...debitLines];
+                        newLines[idx].montantCP = Number(e.target.value);
+                        setDebitLines(newLines);
+                      }}
+                      style={styles.cellInput}
+                      placeholder="0"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setDebitLines(debitLines.filter((_, i) => i !== idx))}
+                      style={styles.deleteLineBtn}
+                    >
+                      X
+                    </button>
                   </div>
-                  <select
-                    value={line.categorieId ?? ''}
-                    onChange={async (e) => {
-                      const categorieId = e.target.value ? Number(e.target.value) : null;
-                      await handleCategoryChange(idx, true, categorieId);
-                    }}
-                    style={styles.cellInput}
-                  >
-                    <option value="">Sélectionner</option>
-                    {categories.map((categorie) => (
-                      <option key={categorie.id} value={categorie.id}>
-                        {categorie.libelle}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    type="number"
-                    value={line.montantAE}
-                    onChange={(e) => {
-                      const newLines = [...debitLines];
-                      newLines[idx].montantAE = Number(e.target.value);
-                      setDebitLines(newLines);
-                    }}
-                    style={styles.cellInput}
-                    placeholder="0"
-                  />
-                  <input
-                    type="number"
-                    value={line.montantCP}
-                    onChange={(e) => {
-                      const newLines = [...debitLines];
-                      newLines[idx].montantCP = Number(e.target.value);
-                      setDebitLines(newLines);
-                    }}
-                    style={styles.cellInput}
-                    placeholder="0"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setDebitLines(debitLines.filter((_, i) => i !== idx))}
-                    style={styles.deleteLineBtn}
-                  >
-                    X
-                  </button>
-                </div>
-                {line.categorieId && (
-                  <div style={styles.hiddenSelectRow}>
-                    <div style={styles.hiddenSelectField}>
-                      <label style={styles.hiddenLabel}>Action</label>
-                      <select
-                        value={line.actionId ?? ''}
-                        onChange={async (e) => {
-                          const actionId = e.target.value ? Number(e.target.value) : null;
-                          await handleActionChange(idx, true, actionId);
-                        }}
-                        style={styles.cellInput}
-                        disabled={!line.categorieId}
-                      >
-                        <option value="">Sélectionner</option>
-                        {line.actions.map((action) => (
-                          <option key={action.id} value={action.id}>
-                            {action.libelle}
-                          </option>
-                        ))}
-                      </select>
+                  {line.categorieId && (
+                    <div style={styles.hiddenSelectRow}>
+                      <div style={styles.hiddenSelectField}>
+                        <label style={styles.hiddenLabel}>Action</label>
+                        <select
+                          value={line.actionId ?? ''}
+                          onChange={async (e) => {
+                            const actionId = e.target.value ? Number(e.target.value) : null;
+                            await handleActionChange(idx, true, actionId);
+                          }}
+                          style={styles.cellInput}
+                          disabled={!line.categorieId}
+                        >
+                          <option value="">Sélectionner</option>
+                          {line.actions.map((action) => (
+                            <option key={action.id} value={action.id}>
+                              {action.libelle}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      {line.actionId && (
+                        <div style={styles.hiddenSelectField}>
+                          <label style={styles.hiddenLabel}>Activité</label>
+                          <select
+                            value={line.activiteId ?? ''}
+                            onChange={(e) => {
+                              const activiteId = e.target.value ? Number(e.target.value) : null;
+                              handleActiviteChange(idx, true, activiteId);
+                            }}
+                            style={styles.cellInput}
+                          >
+                            <option value="">Sélectionner</option>
+                            {line.activites.map((activite) => (
+                              <option key={activite.id} value={activite.id}>
+                                {activite.libelle}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                      {line.activiteId && (
+                        <div style={styles.hiddenSelectField}>
+                          <label style={styles.hiddenLabel}>Nature économique</label>
+                          <select
+                            value={line.natureId ?? ''}
+                            onChange={(e) => {
+                              const natureId = e.target.value ? Number(e.target.value) : null;
+                              handleNatureChange(idx, true, natureId);
+                            }}
+                            style={styles.cellInput}
+                          >
+                            <option value="">Sélectionner</option>
+                            {natures.map((nature) => (
+                              <option key={nature.id} value={nature.id}>
+                                {nature.libelle}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
                     </div>
-                    {line.actionId && (
-                      <div style={styles.hiddenSelectField}>
-                        <label style={styles.hiddenLabel}>Activité</label>
-                        <select
-                          value={line.activiteId ?? ''}
-                          onChange={(e) => {
-                            const activiteId = e.target.value ? Number(e.target.value) : null;
-                            handleActiviteChange(idx, true, activiteId);
-                          }}
-                          style={styles.cellInput}
-                        >
-                          <option value="">Sélectionner</option>
-                          {line.activites.map((activite) => (
-                            <option key={activite.id} value={activite.id}>
-                              {activite.libelle}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-                    {line.activiteId && (
-                      <div style={styles.hiddenSelectField}>
-                        <label style={styles.hiddenLabel}>Nature économique</label>
-                        <select
-                          value={line.natureId ?? ''}
-                          onChange={(e) => {
-                            const natureId = e.target.value ? Number(e.target.value) : null;
-                            handleNatureChange(idx, true, natureId);
-                          }}
-                          style={styles.cellInput}
-                        >
-                          <option value="">Sélectionner</option>
-                          {natures.map((nature) => (
-                            <option key={nature.id} value={nature.id}>
-                              {nature.libelle}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-                  </div>
-                )}
+                  )}
+                </React.Fragment>
               ))}
 
               <button
@@ -506,144 +508,146 @@ export function TransactionForm() {
                 <div>Action</div>
               </div>
               {creditLines.map((line, idx) => (
-                <div key={idx} style={styles.tableRow}>
-                  <input
-                    type="number"
-                    value={line.groupe}
-                    onChange={(e) => {
-                      const newLines = [...creditLines];
-                      newLines[idx].groupe = Number(e.target.value);
-                      setCreditLines(newLines);
-                    }}
-                    style={styles.cellInput}
-                    placeholder="Groupe"
-                  />
-                  <div style={styles.inputWithButton}>
+                <React.Fragment key={idx}>
+                  <div style={styles.tableRow}>
+                    <input
+                      type="number"
+                      value={line.groupe}
+                      onChange={(e) => {
+                        const newLines = [...creditLines];
+                        newLines[idx].groupe = Number(e.target.value);
+                        setCreditLines(newLines);
+                      }}
+                      style={styles.cellInput}
+                      placeholder="Groupe"
+                    />
+                    <div style={styles.inputWithButton}>
+                      <select
+                        value={line.programmeId ?? ''}
+                        onChange={async (e) => {
+                          const programmeId = e.target.value ? Number(e.target.value) : null;
+                          await handleProgrammeChange(idx, false, programmeId);
+                        }}
+                        style={styles.cellInput}
+                      >
+                        <option value="">Sélectionner</option>
+                        {programmes.map((programme) => (
+                          <option key={programme.id} value={programme.id}>
+                            {programme.libelle}
+                          </option>
+                        ))}
+                      </select>
+                      <button type="button" style={styles.ellipsisBtn}>...</button>
+                    </div>
                     <select
-                      value={line.programmeId ?? ''}
+                      value={line.categorieId ?? ''}
                       onChange={async (e) => {
-                        const programmeId = e.target.value ? Number(e.target.value) : null;
-                        await handleProgrammeChange(idx, false, programmeId);
+                        const categorieId = e.target.value ? Number(e.target.value) : null;
+                        await handleCategoryChange(idx, false, categorieId);
                       }}
                       style={styles.cellInput}
                     >
                       <option value="">Sélectionner</option>
-                      {programmes.map((programme) => (
-                        <option key={programme.id} value={programme.id}>
-                          {programme.libelle}
+                      {categories.map((categorie) => (
+                        <option key={categorie.id} value={categorie.id}>
+                          {categorie.libelle}
                         </option>
                       ))}
                     </select>
-                    <button type="button" style={styles.ellipsisBtn}>...</button>
+                    <input
+                      type="number"
+                      value={line.montantAE}
+                      onChange={(e) => {
+                        const newLines = [...creditLines];
+                        newLines[idx].montantAE = Number(e.target.value);
+                        setCreditLines(newLines);
+                      }}
+                      style={styles.cellInput}
+                      placeholder="0"
+                    />
+                    <input
+                      type="number"
+                      value={line.montantCP}
+                      onChange={(e) => {
+                        const newLines = [...creditLines];
+                        newLines[idx].montantCP = Number(e.target.value);
+                        setCreditLines(newLines);
+                      }}
+                      style={styles.cellInput}
+                      placeholder="0"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setCreditLines(creditLines.filter((_, i) => i !== idx))}
+                      style={styles.deleteLineBtn}
+                    >
+                      X
+                    </button>
                   </div>
-                  <select
-                    value={line.categorieId ?? ''}
-                    onChange={async (e) => {
-                      const categorieId = e.target.value ? Number(e.target.value) : null;
-                      await handleCategoryChange(idx, false, categorieId);
-                    }}
-                    style={styles.cellInput}
-                  >
-                    <option value="">Sélectionner</option>
-                    {categories.map((categorie) => (
-                      <option key={categorie.id} value={categorie.id}>
-                        {categorie.libelle}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    type="number"
-                    value={line.montantAE}
-                    onChange={(e) => {
-                      const newLines = [...creditLines];
-                      newLines[idx].montantAE = Number(e.target.value);
-                      setCreditLines(newLines);
-                    }}
-                    style={styles.cellInput}
-                    placeholder="0"
-                  />
-                  <input
-                    type="number"
-                    value={line.montantCP}
-                    onChange={(e) => {
-                      const newLines = [...creditLines];
-                      newLines[idx].montantCP = Number(e.target.value);
-                      setCreditLines(newLines);
-                    }}
-                    style={styles.cellInput}
-                    placeholder="0"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setCreditLines(creditLines.filter((_, i) => i !== idx))}
-                    style={styles.deleteLineBtn}
-                  >
-                    X
-                  </button>
-                </div>
-                {line.categorieId && (
-                  <div style={styles.hiddenSelectRow}>
-                    <div style={styles.hiddenSelectField}>
-                      <label style={styles.hiddenLabel}>Action</label>
-                      <select
-                        value={line.actionId ?? ''}
-                        onChange={async (e) => {
-                          const actionId = e.target.value ? Number(e.target.value) : null;
-                          await handleActionChange(idx, false, actionId);
-                        }}
-                        style={styles.cellInput}
-                        disabled={!line.categorieId}
-                      >
-                        <option value="">Sélectionner</option>
-                        {line.actions.map((action) => (
-                          <option key={action.id} value={action.id}>
-                            {action.libelle}
-                          </option>
-                        ))}
-                      </select>
+                  {line.categorieId && (
+                    <div style={styles.hiddenSelectRow}>
+                      <div style={styles.hiddenSelectField}>
+                        <label style={styles.hiddenLabel}>Action</label>
+                        <select
+                          value={line.actionId ?? ''}
+                          onChange={async (e) => {
+                            const actionId = e.target.value ? Number(e.target.value) : null;
+                            await handleActionChange(idx, false, actionId);
+                          }}
+                          style={styles.cellInput}
+                          disabled={!line.categorieId}
+                        >
+                          <option value="">Sélectionner</option>
+                          {line.actions.map((action) => (
+                            <option key={action.id} value={action.id}>
+                              {action.libelle}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      {line.actionId && (
+                        <div style={styles.hiddenSelectField}>
+                          <label style={styles.hiddenLabel}>Activité</label>
+                          <select
+                            value={line.activiteId ?? ''}
+                            onChange={(e) => {
+                              const activiteId = e.target.value ? Number(e.target.value) : null;
+                              handleActiviteChange(idx, false, activiteId);
+                            }}
+                            style={styles.cellInput}
+                          >
+                            <option value="">Sélectionner</option>
+                            {line.activites.map((activite) => (
+                              <option key={activite.id} value={activite.id}>
+                                {activite.libelle}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                      {line.activiteId && (
+                        <div style={styles.hiddenSelectField}>
+                          <label style={styles.hiddenLabel}>Nature économique</label>
+                          <select
+                            value={line.natureId ?? ''}
+                            onChange={(e) => {
+                              const natureId = e.target.value ? Number(e.target.value) : null;
+                              handleNatureChange(idx, false, natureId);
+                            }}
+                            style={styles.cellInput}
+                          >
+                            <option value="">Sélectionner</option>
+                            {natures.map((nature) => (
+                              <option key={nature.id} value={nature.id}>
+                                {nature.libelle}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
                     </div>
-                    {line.actionId && (
-                      <div style={styles.hiddenSelectField}>
-                        <label style={styles.hiddenLabel}>Activité</label>
-                        <select
-                          value={line.activiteId ?? ''}
-                          onChange={(e) => {
-                            const activiteId = e.target.value ? Number(e.target.value) : null;
-                            handleActiviteChange(idx, false, activiteId);
-                          }}
-                          style={styles.cellInput}
-                        >
-                          <option value="">Sélectionner</option>
-                          {line.activites.map((activite) => (
-                            <option key={activite.id} value={activite.id}>
-                              {activite.libelle}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-                    {line.activiteId && (
-                      <div style={styles.hiddenSelectField}>
-                        <label style={styles.hiddenLabel}>Nature économique</label>
-                        <select
-                          value={line.natureId ?? ''}
-                          onChange={(e) => {
-                            const natureId = e.target.value ? Number(e.target.value) : null;
-                            handleNatureChange(idx, false, natureId);
-                          }}
-                          style={styles.cellInput}
-                        >
-                          <option value="">Sélectionner</option>
-                          {natures.map((nature) => (
-                            <option key={nature.id} value={nature.id}>
-                              {nature.libelle}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-                  </div>
-                )}
+                  )}
+                </React.Fragment>
               ))}
 
               <button
