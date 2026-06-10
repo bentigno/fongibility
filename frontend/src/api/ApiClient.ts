@@ -1,9 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 
 //const API_BASE_URL = 'http://localhost:8080/api';
-//const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
-const API_BASE_URL = 'https://fongibility-backend.onrender.com/api';
-
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://fongibility-backend.onrender.com/api';
 
 interface AuthResponse {
   token: string;
@@ -33,6 +31,30 @@ class ApiClient {
     if (this.token) {
       this.api.defaults.headers.common['Authorization'] = `Bearer ${this.token}`;
     }
+
+    this.api.interceptors.request.use(
+      (config) => {
+        const currentToken = localStorage.getItem('token');
+        if (currentToken) {
+          config.headers = {
+            ...config.headers,
+            Authorization: `Bearer ${currentToken}`,
+          };
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+
+    this.api.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error?.response?.status === 401) {
+          this.clearToken();
+        }
+        return Promise.reject(error);
+      }
+    );
   }
 
   setToken(token: string) {
