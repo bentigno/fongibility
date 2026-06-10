@@ -3,6 +3,41 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import apiClient from '../api/ApiClient';
 
+const sampleProgrammes = [
+  { id: 1, libelle: '001 - programme test 001' },
+  { id: 2, libelle: '002 - programme test 002' },
+];
+
+const sampleCategories = [
+  { id: 3, libelle: '3' },
+  { id: 4, libelle: '4' },
+  { id: 5, libelle: '5' },
+  { id: 6, libelle: '6' },
+];
+
+const sampleActionsByProgramme: Record<number, { id: number; libelle: string }[]> = {
+  1: [
+    { id: 1, libelle: 'action 001' },
+    { id: 2, libelle: 'action 002' },
+  ],
+  2: [
+    { id: 1, libelle: 'action 001' },
+    { id: 2, libelle: 'action 002' },
+  ],
+};
+
+const sampleActivitesByAction: Record<number, { id: number; libelle: string }[]> = {
+  1: [
+    { id: 1, libelle: 'activité 0011' },
+    { id: 2, libelle: 'activité 0012' },
+  ],
+  2: [
+    { id: 3, libelle: 'activité 0021' },
+    { id: 4, libelle: 'activité 0022' },
+    { id: 5, libelle: 'activite 0023' },
+  ],
+};
+
 interface TransactionLine {
   groupe: number;
   programmeId: number | null;
@@ -32,38 +67,16 @@ export function TransactionForm() {
   const [libelle, setLibelle] = useState<string>('');
   const [sourceFin, setSourceFin] = useState<string>('Fonds propres');
   const [bailleur, setBailleur] = useState<string>('Etat');
-  const [programmes, setProgrammes] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [programmes, setProgrammes] = useState<any[]>(sampleProgrammes);
+  const [categories, setCategories] = useState<any[]>(sampleCategories);
   const [natures, setNatures] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [expandedDebitIdx, setExpandedDebitIdx] = useState<number | null>(null);
   const [expandedCreditIdx, setExpandedCreditIdx] = useState<number | null>(null);
 
   useEffect(() => {
-    loadProgrammes();
-    loadCategories();
     loadNatures();
   }, []);
-
-  const loadProgrammes = async () => {
-    try {
-      if (user?.sectionId) {
-        const response = await apiClient.getProgrammesBySection(user.sectionId);
-        setProgrammes(response.data);
-      }
-    } catch (err) {
-      console.error('Erreur chargement programmes:', err);
-    }
-  };
-
-  const loadCategories = async () => {
-    try {
-      const response = await apiClient.getCategories();
-      setCategories(response.data);
-    } catch (err) {
-      console.error('Erreur chargement catégories:', err);
-    }
-  };
 
   const loadNatures = async () => {
     try {
@@ -75,6 +88,9 @@ export function TransactionForm() {
   };
 
   const loadActions = async (programmeId: number) => {
+    if (sampleActionsByProgramme[programmeId]) {
+      return sampleActionsByProgramme[programmeId];
+    }
     try {
       const response = await apiClient.getActionsByProgramme(programmeId);
       return response.data;
@@ -85,6 +101,9 @@ export function TransactionForm() {
   };
 
   const loadActivites = async (actionId: number) => {
+    if (sampleActivitesByAction[actionId]) {
+      return sampleActivitesByAction[actionId];
+    }
     try {
       const response = await apiClient.getActivitiesByAction(actionId);
       return response.data;
@@ -337,7 +356,7 @@ export function TransactionForm() {
                 <div>Catég. dép.</div>
                 <div>Montant AE</div>
                 <div>Montant CP</div>
-                <div>Action</div>
+                <div></div>
               </div>
               {debitLines.map((line, idx) => (
                 <React.Fragment key={idx}>
@@ -505,7 +524,7 @@ export function TransactionForm() {
                 <div>Catég. dép.</div>
                 <div>Montant AE</div>
                 <div>Montant CP</div>
-                <div>Action</div>
+                <div></div>
               </div>
               {creditLines.map((line, idx) => (
                 <React.Fragment key={idx}>
