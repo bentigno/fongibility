@@ -38,6 +38,13 @@ const sampleActivitesByAction: Record<number, { id: number; libelle: string }[]>
   ],
 };
 
+const sampleNatures = [
+  { id: 2060, libelle: '2060' },
+  { id: 2070, libelle: '2070' },
+  { id: 2080, libelle: '2080' },
+  { id: 2090, libelle: '2090' },
+];
+
 interface TransactionLine {
   groupe: number;
   programmeId: number | null;
@@ -69,7 +76,7 @@ export function TransactionForm() {
   const [bailleur, setBailleur] = useState<string>('Etat');
   const [programmes, setProgrammes] = useState<any[]>(sampleProgrammes);
   const [categories, setCategories] = useState<any[]>(sampleCategories);
-  const [natures, setNatures] = useState<any[]>([]);
+  const [natures, setNatures] = useState<any[]>(sampleNatures);
   const [loading, setLoading] = useState(false);
   const [expandedDebitIdx, setExpandedDebitIdx] = useState<number | null>(null);
   const [expandedCreditIdx, setExpandedCreditIdx] = useState<number | null>(null);
@@ -81,7 +88,14 @@ export function TransactionForm() {
   const loadNatures = async () => {
     try {
       const response = await apiClient.getNatures();
-      setNatures(response.data);
+      const apiNatures = Array.isArray(response.data) ? response.data : [];
+      const merged = [...sampleNatures];
+      apiNatures.forEach((nature: any) => {
+        if (!merged.some((item) => item.id === nature.id)) {
+          merged.push(nature);
+        }
+      });
+      setNatures(merged);
     } catch (err) {
       console.error('Erreur chargement natures économiques:', err);
     }
@@ -388,7 +402,6 @@ export function TransactionForm() {
                           </option>
                         ))}
                       </select>
-                      <button type="button" style={styles.ellipsisBtn}>...</button>
                     </div>
                     <select
                       value={line.categorieId ?? ''}
@@ -556,7 +569,6 @@ export function TransactionForm() {
                           </option>
                         ))}
                       </select>
-                      <button type="button" style={styles.ellipsisBtn}>...</button>
                     </div>
                     <select
                       value={line.categorieId ?? ''}
