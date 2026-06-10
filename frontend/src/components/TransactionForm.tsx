@@ -191,177 +191,87 @@ export function TransactionForm() {
           <div style={styles.doubleSection}>
             <div style={styles.sectionBox}>
               <div style={styles.sectionHeader}>Débit</div>
-              
+              <div style={styles.tableHeader}>
+                <div>Groupe</div>
+                <div>Programme</div>
+                <div>Catég. dép.</div>
+                <div>Montant AE</div>
+                <div>Montant CP</div>
+                <div>Action</div>
+              </div>
               {debitLines.map((line, idx) => (
-                <div key={idx} style={styles.lineForm}>
-                  <div style={styles.lineHeader} onClick={() => setExpandedDebitIdx(expandedDebitIdx === idx ? null : idx)}>
-                    <span style={styles.lineTitle}>Ligne {idx + 1}</span>
-                    <span style={styles.expandIcon}>{expandedDebitIdx === idx ? '▼' : '▶'}</span>
+                <div key={idx} style={styles.tableRow}>
+                  <input
+                    type="number"
+                    value={line.groupe}
+                    onChange={(e) => {
+                      const newLines = [...debitLines];
+                      newLines[idx].groupe = Number(e.target.value);
+                      setDebitLines(newLines);
+                    }}
+                    style={styles.cellInput}
+                    placeholder="Groupe"
+                  />
+                  <div style={styles.inputWithButton}>
+                    <input
+                      type="text"
+                      value={line.programme}
+                      onChange={(e) => {
+                        const newLines = [...debitLines];
+                        newLines[idx].programme = e.target.value;
+                        setDebitLines(newLines);
+                      }}
+                      style={styles.cellInput}
+                      placeholder="Programme"
+                    />
+                    <button type="button" style={styles.ellipsisBtn}>...</button>
                   </div>
-                  
-                  {expandedDebitIdx === idx && (
-                    <div style={styles.lineContent}>
-                      {/* Ligne 1 */}
-                      <div style={styles.gridRow}>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Groupe</label>
-                          <input 
-                            type="number" 
-                            value={line.groupe} 
-                            onChange={(e) => {
-                              const newLines = [...debitLines];
-                              newLines[idx].groupe = Number(e.target.value);
-                              setDebitLines(newLines);
-                            }} 
-                            style={styles.formInput} 
-                            placeholder="Groupe"
-                          />
-                        </div>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Programme</label>
-                          <div style={styles.inputWithButton}>
-                            <input 
-                              type="text" 
-                              value={line.programme} 
-                              onChange={(e) => {
-                                const newLines = [...debitLines];
-                                newLines[idx].programme = e.target.value;
-                                setDebitLines(newLines);
-                              }} 
-                              style={styles.formInput} 
-                              placeholder="Programme"
-                            />
-                            <button type="button" style={styles.ellipsisBtn}>...</button>
-                          </div>
-                        </div>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Catégorie dépense</label>
-                          <input 
-                            type="text" 
-                            value={line.categorie} 
-                            onChange={(e) => {
-                              const newLines = [...debitLines];
-                              newLines[idx].categorie = e.target.value;
-                              setDebitLines(newLines);
-                            }} 
-                            style={styles.formInput} 
-                            placeholder="Catégorie"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Ligne 2 */}
-                      <div style={styles.gridRow}>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Action</label>
-                          <input 
-                            type="text" 
-                            value={line.action} 
-                            onChange={(e) => {
-                              const newLines = [...debitLines];
-                              newLines[idx].action = e.target.value;
-                              setDebitLines(newLines);
-                            }} 
-                            style={styles.formInput} 
-                            placeholder="Action"
-                          />
-                        </div>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Activité</label>
-                          <input 
-                            type="text" 
-                            value={line.activite} 
-                            onChange={(e) => {
-                              const newLines = [...debitLines];
-                              newLines[idx].activite = e.target.value;
-                              setDebitLines(newLines);
-                            }} 
-                            style={styles.formInput} 
-                            placeholder="Activité"
-                          />
-                        </div>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Nature économique</label>
-                          <input 
-                            type="text" 
-                            value={line.nature} 
-                            onChange={(e) => {
-                              const newLines = [...debitLines];
-                              newLines[idx].nature = e.target.value;
-                              setDebitLines(newLines);
-                            }} 
-                            style={styles.formInput} 
-                            placeholder="Nature"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Ligne 3 */}
-                      <div style={styles.gridRow}>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Chapitre</label>
-                          <input 
-                            type="text" 
-                            value={line.chapitre} 
-                            onChange={(e) => {
-                              const newLines = [...debitLines];
-                              newLines[idx].chapitre = e.target.value;
-                              setDebitLines(newLines);
-                            }} 
-                            style={styles.formInput} 
-                            placeholder="Chapitre"
-                          />
-                        </div>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Montant AE</label>
-                          <input 
-                            type="number" 
-                            value={line.montantAE} 
-                            onChange={(e) => {
-                              const newLines = [...debitLines];
-                              newLines[idx].montantAE = Number(e.target.value);
-                              setDebitLines(newLines);
-                            }} 
-                            style={styles.formInput} 
-                            placeholder="0"
-                          />
-                        </div>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Montant CP</label>
-                          <input 
-                            type="number" 
-                            value={line.montantCP} 
-                            onChange={(e) => {
-                              const newLines = [...debitLines];
-                              newLines[idx].montantCP = Number(e.target.value);
-                              setDebitLines(newLines);
-                            }} 
-                            style={styles.formInput} 
-                            placeholder="0"
-                          />
-                        </div>
-                      </div>
-
-                      <div style={styles.lineActions}>
-                        <button 
-                          type="button" 
-                          onClick={() => {
-                            setDebitLines(debitLines.filter((_, i) => i !== idx));
-                            setExpandedDebitIdx(null);
-                          }} 
-                          style={styles.deleteCellBtn}
-                        >
-                          Supprimer
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                  <input
+                    type="text"
+                    value={line.categorie}
+                    onChange={(e) => {
+                      const newLines = [...debitLines];
+                      newLines[idx].categorie = e.target.value;
+                      setDebitLines(newLines);
+                    }}
+                    style={styles.cellInput}
+                    placeholder="Catégorie"
+                  />
+                  <input
+                    type="number"
+                    value={line.montantAE}
+                    onChange={(e) => {
+                      const newLines = [...debitLines];
+                      newLines[idx].montantAE = Number(e.target.value);
+                      setDebitLines(newLines);
+                    }}
+                    style={styles.cellInput}
+                    placeholder="0"
+                  />
+                  <input
+                    type="number"
+                    value={line.montantCP}
+                    onChange={(e) => {
+                      const newLines = [...debitLines];
+                      newLines[idx].montantCP = Number(e.target.value);
+                      setDebitLines(newLines);
+                    }}
+                    style={styles.cellInput}
+                    placeholder="0"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setDebitLines(debitLines.filter((_, i) => i !== idx))}
+                    style={styles.deleteLineBtn}
+                  >
+                    X
+                  </button>
                 </div>
               ))}
 
-              <button 
-                type="button" 
-                onClick={handleAddDebitLine} 
+              <button
+                type="button"
+                onClick={handleAddDebitLine}
                 style={styles.addLineBtn}
               >
                 + Ajouter une ligne
@@ -376,177 +286,87 @@ export function TransactionForm() {
 
             <div style={styles.sectionBox}>
               <div style={styles.sectionHeader}>Crédit</div>
-              
+              <div style={styles.tableHeader}>
+                <div>Groupe</div>
+                <div>Programme</div>
+                <div>Catég. dép.</div>
+                <div>Montant AE</div>
+                <div>Montant CP</div>
+                <div>Action</div>
+              </div>
               {creditLines.map((line, idx) => (
-                <div key={idx} style={styles.lineForm}>
-                  <div style={styles.lineHeader} onClick={() => setExpandedCreditIdx(expandedCreditIdx === idx ? null : idx)}>
-                    <span style={styles.lineTitle}>Ligne {idx + 1}</span>
-                    <span style={styles.expandIcon}>{expandedCreditIdx === idx ? '▼' : '▶'}</span>
+                <div key={idx} style={styles.tableRow}>
+                  <input
+                    type="number"
+                    value={line.groupe}
+                    onChange={(e) => {
+                      const newLines = [...creditLines];
+                      newLines[idx].groupe = Number(e.target.value);
+                      setCreditLines(newLines);
+                    }}
+                    style={styles.cellInput}
+                    placeholder="Groupe"
+                  />
+                  <div style={styles.inputWithButton}>
+                    <input
+                      type="text"
+                      value={line.programme}
+                      onChange={(e) => {
+                        const newLines = [...creditLines];
+                        newLines[idx].programme = e.target.value;
+                        setCreditLines(newLines);
+                      }}
+                      style={styles.cellInput}
+                      placeholder="Programme"
+                    />
+                    <button type="button" style={styles.ellipsisBtn}>...</button>
                   </div>
-                  
-                  {expandedCreditIdx === idx && (
-                    <div style={styles.lineContent}>
-                      {/* Ligne 1 */}
-                      <div style={styles.gridRow}>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Groupe</label>
-                          <input 
-                            type="number" 
-                            value={line.groupe} 
-                            onChange={(e) => {
-                              const newLines = [...creditLines];
-                              newLines[idx].groupe = Number(e.target.value);
-                              setCreditLines(newLines);
-                            }} 
-                            style={styles.formInput} 
-                            placeholder="Groupe"
-                          />
-                        </div>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Programme</label>
-                          <div style={styles.inputWithButton}>
-                            <input 
-                              type="text" 
-                              value={line.programme} 
-                              onChange={(e) => {
-                                const newLines = [...creditLines];
-                                newLines[idx].programme = e.target.value;
-                                setCreditLines(newLines);
-                              }} 
-                              style={styles.formInput} 
-                              placeholder="Programme"
-                            />
-                            <button type="button" style={styles.ellipsisBtn}>...</button>
-                          </div>
-                        </div>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Catégorie dépense</label>
-                          <input 
-                            type="text" 
-                            value={line.categorie} 
-                            onChange={(e) => {
-                              const newLines = [...creditLines];
-                              newLines[idx].categorie = e.target.value;
-                              setCreditLines(newLines);
-                            }} 
-                            style={styles.formInput} 
-                            placeholder="Catégorie"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Ligne 2 */}
-                      <div style={styles.gridRow}>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Action</label>
-                          <input 
-                            type="text" 
-                            value={line.action} 
-                            onChange={(e) => {
-                              const newLines = [...creditLines];
-                              newLines[idx].action = e.target.value;
-                              setCreditLines(newLines);
-                            }} 
-                            style={styles.formInput} 
-                            placeholder="Action"
-                          />
-                        </div>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Activité</label>
-                          <input 
-                            type="text" 
-                            value={line.activite} 
-                            onChange={(e) => {
-                              const newLines = [...creditLines];
-                              newLines[idx].activite = e.target.value;
-                              setCreditLines(newLines);
-                            }} 
-                            style={styles.formInput} 
-                            placeholder="Activité"
-                          />
-                        </div>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Nature économique</label>
-                          <input 
-                            type="text" 
-                            value={line.nature} 
-                            onChange={(e) => {
-                              const newLines = [...creditLines];
-                              newLines[idx].nature = e.target.value;
-                              setCreditLines(newLines);
-                            }} 
-                            style={styles.formInput} 
-                            placeholder="Nature"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Ligne 3 */}
-                      <div style={styles.gridRow}>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Chapitre</label>
-                          <input 
-                            type="text" 
-                            value={line.chapitre} 
-                            onChange={(e) => {
-                              const newLines = [...creditLines];
-                              newLines[idx].chapitre = e.target.value;
-                              setCreditLines(newLines);
-                            }} 
-                            style={styles.formInput} 
-                            placeholder="Chapitre"
-                          />
-                        </div>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Montant AE</label>
-                          <input 
-                            type="number" 
-                            value={line.montantAE} 
-                            onChange={(e) => {
-                              const newLines = [...creditLines];
-                              newLines[idx].montantAE = Number(e.target.value);
-                              setCreditLines(newLines);
-                            }} 
-                            style={styles.formInput} 
-                            placeholder="0"
-                          />
-                        </div>
-                        <div style={styles.formField}>
-                          <label style={styles.fieldLabel}>Montant CP</label>
-                          <input 
-                            type="number" 
-                            value={line.montantCP} 
-                            onChange={(e) => {
-                              const newLines = [...creditLines];
-                              newLines[idx].montantCP = Number(e.target.value);
-                              setCreditLines(newLines);
-                            }} 
-                            style={styles.formInput} 
-                            placeholder="0"
-                          />
-                        </div>
-                      </div>
-
-                      <div style={styles.lineActions}>
-                        <button 
-                          type="button" 
-                          onClick={() => {
-                            setCreditLines(creditLines.filter((_, i) => i !== idx));
-                            setExpandedCreditIdx(null);
-                          }} 
-                          style={styles.deleteCellBtn}
-                        >
-                          Supprimer
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                  <input
+                    type="text"
+                    value={line.categorie}
+                    onChange={(e) => {
+                      const newLines = [...creditLines];
+                      newLines[idx].categorie = e.target.value;
+                      setCreditLines(newLines);
+                    }}
+                    style={styles.cellInput}
+                    placeholder="Catégorie"
+                  />
+                  <input
+                    type="number"
+                    value={line.montantAE}
+                    onChange={(e) => {
+                      const newLines = [...creditLines];
+                      newLines[idx].montantAE = Number(e.target.value);
+                      setCreditLines(newLines);
+                    }}
+                    style={styles.cellInput}
+                    placeholder="0"
+                  />
+                  <input
+                    type="number"
+                    value={line.montantCP}
+                    onChange={(e) => {
+                      const newLines = [...creditLines];
+                      newLines[idx].montantCP = Number(e.target.value);
+                      setCreditLines(newLines);
+                    }}
+                    style={styles.cellInput}
+                    placeholder="0"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setCreditLines(creditLines.filter((_, i) => i !== idx))}
+                    style={styles.deleteLineBtn}
+                  >
+                    X
+                  </button>
                 </div>
               ))}
 
-              <button 
-                type="button" 
-                onClick={handleAddCreditLine} 
+              <button
+                type="button"
+                onClick={handleAddCreditLine}
                 style={styles.addLineBtn}
               >
                 + Ajouter une ligne
@@ -834,6 +654,44 @@ const styles = {
     paddingTop: '12px',
     borderTop: '1px solid #ddd',
   },
+  tableHeader: {
+    display: 'grid',
+    gridTemplateColumns: '0.8fr 1.8fr 1.2fr 1fr 1fr 0.6fr',
+    gap: '10px',
+    padding: '10px 0',
+    fontWeight: 700 as const,
+    borderBottom: '1px solid #d8d8d8',
+    color: '#333',
+  },
+  tableRow: {
+    display: 'grid',
+    gridTemplateColumns: '0.8fr 1.8fr 1.2fr 1fr 1fr 0.6fr',
+    gap: '10px',
+    alignItems: 'center',
+    marginBottom: '8px',
+  },
+  cellInput: {
+    width: '100%',
+    padding: '8px 10px',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+    fontSize: '14px',
+    boxSizing: 'border-box' as const,
+  },
+  deleteLineBtn: {
+    width: '36px',
+    height: '36px',
+    border: '1px solid #dee2e6',
+    borderRadius: '4px',
+    backgroundColor: '#f8d7da',
+    color: '#721c24',
+    cursor: 'pointer',
+  },
+  inputWithButton: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+  },
   addLineBtn: {
     width: '100%',
     padding: '10px 16px',
@@ -845,6 +703,7 @@ const styles = {
     fontSize: '14px',
     fontWeight: 600 as const,
     marginBottom: '12px',
+    marginTop: '10px',
   },
   primaryButtonRow: {
     display: 'flex',
