@@ -5,14 +5,21 @@ import apiClient from '../api/ApiClient';
 
 interface TransactionLine {
   groupe: number;
+  programmeId: number | null;
   programme: string;
+  categorieId: number | null;
   categorie: string;
+  actionId: number | null;
   action: string;
+  activiteId: number | null;
   activite: string;
+  natureId: number | null;
   nature: string;
   chapitre: string;
   montantAE: number;
   montantCP: number;
+  actions: any[];
+  activites: any[];
 }
 
 export function TransactionForm() {
@@ -26,14 +33,16 @@ export function TransactionForm() {
   const [sourceFin, setSourceFin] = useState<string>('Fonds propres');
   const [bailleur, setBailleur] = useState<string>('Etat');
   const [programmes, setProgrammes] = useState<any[]>([]);
-  const [actions, setActions] = useState<any[]>([]);
-  const [activites, setActivites] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [natures, setNatures] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [expandedDebitIdx, setExpandedDebitIdx] = useState<number | null>(null);
   const [expandedCreditIdx, setExpandedCreditIdx] = useState<number | null>(null);
 
   useEffect(() => {
     loadProgrammes();
+    loadCategories();
+    loadNatures();
   }, []);
 
   const loadProgrammes = async () => {
@@ -47,30 +56,161 @@ export function TransactionForm() {
     }
   };
 
+  const loadCategories = async () => {
+    try {
+      const response = await apiClient.getCategories();
+      setCategories(response.data);
+    } catch (err) {
+      console.error('Erreur chargement catégories:', err);
+    }
+  };
+
+  const loadNatures = async () => {
+    try {
+      const response = await apiClient.getNatures();
+      setNatures(response.data);
+    } catch (err) {
+      console.error('Erreur chargement natures économiques:', err);
+    }
+  };
+
   const loadActions = async (programmeId: number) => {
     try {
       const response = await apiClient.getActionsByProgramme(programmeId);
-      setActions(response.data);
+      return response.data;
     } catch (err) {
       console.error('Erreur chargement actions:', err);
+      return [];
     }
   };
 
   const loadActivites = async (actionId: number) => {
     try {
       const response = await apiClient.getActivitiesByAction(actionId);
-      setActivites(response.data);
+      return response.data;
     } catch (err) {
       console.error('Erreur chargement activités:', err);
+      return [];
     }
   };
 
+  const emptyLine = (): TransactionLine => ({
+    groupe: 0,
+    programmeId: null,
+    programme: '',
+    categorieId: null,
+    categorie: '',
+    actionId: null,
+    action: '',
+    activiteId: null,
+    activite: '',
+    natureId: null,
+    nature: '',
+    chapitre: '',
+    montantAE: 0,
+    montantCP: 0,
+    actions: [],
+    activites: [],
+  });
+
+  const updateLine = (lines: TransactionLine[], idx: number, updated: Partial<TransactionLine>) => {
+    const newLines = [...lines];
+    newLines[idx] = { ...newLines[idx], ...updated };
+    return newLines;
+  };
+
+  const handleProgrammeChange = async (idx: number, isDebit: boolean, programmeId: number | null) => {
+    const sourceLines = isDebit ? debitLines : creditLines;
+    const selectedProgramme = programmes.find((p) => p.id === programmeId);
+    const newLine = {
+      ...sourceLines[idx],
+      programmeId,
+      programme: selectedProgramme?.libelle ?? '',
+      categorieId: null,
+      categorie: '',
+      actionId: null,
+      action: '',
+      activiteId: null,
+      activite: '',
+      natureId: null,
+      nature: '',
+      actions: programmeId ? await loadActions(programmeId) : [],
+      activites: [],
+    };
+    const updatedLines = updateLine(sourceLines, idx, newLine);
+    isDebit ? setDebitLines(updatedLines) : setCreditLines(updatedLines);
+  };
+
+  const handleCategoryChange = async (idx: number, isDebit: boolean, categorieId: number | null) => {
+    const sourceLines = isDebit ? debitLines : creditLines;
+    const selectedCategory = categories.find((c) => c.id === categorieId);
+    const currentLine = sourceLines[idx];
+    const newLine = {
+      ...currentLine,
+      categorieId,
+      categorie: selectedCategory?.libelle ?? '',
+      actionId: null,
+      action: '',
+      activiteId: null,
+      activite: '',
+      natureId: null,
+      nature: '',
+      activites: [],
+      actions: currentLine.programmeId ? await loadActions(currentLine.programmeId) : [],
+    };
+    const updatedLines = updateLine(sourceLines, idx, newLine);
+    isDebit ? setDebitLines(updatedLines) : setCreditLines(updatedLines);
+  };
+
+  const handleActionChange = async (idx: number, isDebit: boolean, actionId: number | null) => {
+    const sourceLines = isDebit ? debitLines : creditLines;
+    const selectedAction = sourceLines[idx].actions.find((a) => a.id === actionId);
+    const newLine = {
+      ...sourceLines[idx],
+      actionId,
+      action: selectedAction?.libelle ?? '',
+      activiteId: null,
+      activite: '',
+      natureId: null,
+      nature: '',
+      activites: actionId ? await loadActivites(actionId) : [],
+    };
+    const updatedLines = updateLine(sourceLines, idx, newLine);
+    isDebit ? setDebitLines(updatedLines) : setCreditLines(updatedLines);
+  };
+
+  const handleActiviteChange = (idx: number, isDebit: boolean, activiteId: number | null) => {
+    const sourceLines = isDebit ? debitLines : creditLines;
+    const selectedActivite = sourceLines[idx].activites.find((a) => a.id === activiteId);
+    const newLine = {
+      ...sourceLines[idx],
+      activiteId,
+      activite: selectedActivite?.libelle ?? '',
+      natureId: null,
+      nature: '',
+    };
+    const updatedLines = updateLine(sourceLines, idx, newLine);
+    isDebit ? setDebitLines(updatedLines) : setCreditLines(updatedLines);
+  };
+
+  const handleNatureChange = (idx: number, isDebit: boolean, natureId: number | null) => {
+    const sourceLines = isDebit ? debitLines : creditLines;
+    const selectedNature = natures.find((n) => n.id === natureId);
+    const newLine = {
+      ...sourceLines[idx],
+      natureId,
+      nature: selectedNature?.libelle ?? '',
+    };
+    const updatedLines = updateLine(sourceLines, idx, newLine);
+    isDebit ? setDebitLines(updatedLines) : setCreditLines(updatedLines);
+  };
+
   const handleAddDebitLine = () => {
-    setDebitLines([...debitLines, { groupe: 0, programme: '', categorie: '', action: '', activite: '', nature: '', chapitre: '', montantAE: 0, montantCP: 0 }]);
+    setDebitLines([...debitLines, emptyLine()]);
   };
 
   const handleAddCreditLine = () => {
-    setCreditLines([...creditLines, { groupe: 0, programme: '', categorie: '', action: '', activite: '', nature: '', chapitre: '', montantAE: 0, montantCP: 0 }]);
+    setCreditLines([...creditLines, emptyLine()]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -213,30 +353,38 @@ export function TransactionForm() {
                     placeholder="Groupe"
                   />
                   <div style={styles.inputWithButton}>
-                    <input
-                      type="text"
-                      value={line.programme}
-                      onChange={(e) => {
-                        const newLines = [...debitLines];
-                        newLines[idx].programme = e.target.value;
-                        setDebitLines(newLines);
+                    <select
+                      value={line.programmeId ?? ''}
+                      onChange={async (e) => {
+                        const programmeId = e.target.value ? Number(e.target.value) : null;
+                        await handleProgrammeChange(idx, true, programmeId);
                       }}
                       style={styles.cellInput}
-                      placeholder="Programme"
-                    />
+                    >
+                      <option value="">Sélectionner</option>
+                      {programmes.map((programme) => (
+                        <option key={programme.id} value={programme.id}>
+                          {programme.libelle}
+                        </option>
+                      ))}
+                    </select>
                     <button type="button" style={styles.ellipsisBtn}>...</button>
                   </div>
-                  <input
-                    type="text"
-                    value={line.categorie}
-                    onChange={(e) => {
-                      const newLines = [...debitLines];
-                      newLines[idx].categorie = e.target.value;
-                      setDebitLines(newLines);
+                  <select
+                    value={line.categorieId ?? ''}
+                    onChange={async (e) => {
+                      const categorieId = e.target.value ? Number(e.target.value) : null;
+                      await handleCategoryChange(idx, true, categorieId);
                     }}
                     style={styles.cellInput}
-                    placeholder="Catégorie"
-                  />
+                  >
+                    <option value="">Sélectionner</option>
+                    {categories.map((categorie) => (
+                      <option key={categorie.id} value={categorie.id}>
+                        {categorie.libelle}
+                      </option>
+                    ))}
+                  </select>
                   <input
                     type="number"
                     value={line.montantAE}
@@ -267,6 +415,69 @@ export function TransactionForm() {
                     X
                   </button>
                 </div>
+                {line.categorieId && (
+                  <div style={styles.hiddenSelectRow}>
+                    <div style={styles.hiddenSelectField}>
+                      <label style={styles.hiddenLabel}>Action</label>
+                      <select
+                        value={line.actionId ?? ''}
+                        onChange={async (e) => {
+                          const actionId = e.target.value ? Number(e.target.value) : null;
+                          await handleActionChange(idx, true, actionId);
+                        }}
+                        style={styles.cellInput}
+                        disabled={!line.categorieId}
+                      >
+                        <option value="">Sélectionner</option>
+                        {line.actions.map((action) => (
+                          <option key={action.id} value={action.id}>
+                            {action.libelle}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    {line.actionId && (
+                      <div style={styles.hiddenSelectField}>
+                        <label style={styles.hiddenLabel}>Activité</label>
+                        <select
+                          value={line.activiteId ?? ''}
+                          onChange={(e) => {
+                            const activiteId = e.target.value ? Number(e.target.value) : null;
+                            handleActiviteChange(idx, true, activiteId);
+                          }}
+                          style={styles.cellInput}
+                        >
+                          <option value="">Sélectionner</option>
+                          {line.activites.map((activite) => (
+                            <option key={activite.id} value={activite.id}>
+                              {activite.libelle}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                    {line.activiteId && (
+                      <div style={styles.hiddenSelectField}>
+                        <label style={styles.hiddenLabel}>Nature économique</label>
+                        <select
+                          value={line.natureId ?? ''}
+                          onChange={(e) => {
+                            const natureId = e.target.value ? Number(e.target.value) : null;
+                            handleNatureChange(idx, true, natureId);
+                          }}
+                          style={styles.cellInput}
+                        >
+                          <option value="">Sélectionner</option>
+                          {natures.map((nature) => (
+                            <option key={nature.id} value={nature.id}>
+                              {nature.libelle}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                )}
               ))}
 
               <button
@@ -308,30 +519,38 @@ export function TransactionForm() {
                     placeholder="Groupe"
                   />
                   <div style={styles.inputWithButton}>
-                    <input
-                      type="text"
-                      value={line.programme}
-                      onChange={(e) => {
-                        const newLines = [...creditLines];
-                        newLines[idx].programme = e.target.value;
-                        setCreditLines(newLines);
+                    <select
+                      value={line.programmeId ?? ''}
+                      onChange={async (e) => {
+                        const programmeId = e.target.value ? Number(e.target.value) : null;
+                        await handleProgrammeChange(idx, false, programmeId);
                       }}
                       style={styles.cellInput}
-                      placeholder="Programme"
-                    />
+                    >
+                      <option value="">Sélectionner</option>
+                      {programmes.map((programme) => (
+                        <option key={programme.id} value={programme.id}>
+                          {programme.libelle}
+                        </option>
+                      ))}
+                    </select>
                     <button type="button" style={styles.ellipsisBtn}>...</button>
                   </div>
-                  <input
-                    type="text"
-                    value={line.categorie}
-                    onChange={(e) => {
-                      const newLines = [...creditLines];
-                      newLines[idx].categorie = e.target.value;
-                      setCreditLines(newLines);
+                  <select
+                    value={line.categorieId ?? ''}
+                    onChange={async (e) => {
+                      const categorieId = e.target.value ? Number(e.target.value) : null;
+                      await handleCategoryChange(idx, false, categorieId);
                     }}
                     style={styles.cellInput}
-                    placeholder="Catégorie"
-                  />
+                  >
+                    <option value="">Sélectionner</option>
+                    {categories.map((categorie) => (
+                      <option key={categorie.id} value={categorie.id}>
+                        {categorie.libelle}
+                      </option>
+                    ))}
+                  </select>
                   <input
                     type="number"
                     value={line.montantAE}
@@ -362,6 +581,69 @@ export function TransactionForm() {
                     X
                   </button>
                 </div>
+                {line.categorieId && (
+                  <div style={styles.hiddenSelectRow}>
+                    <div style={styles.hiddenSelectField}>
+                      <label style={styles.hiddenLabel}>Action</label>
+                      <select
+                        value={line.actionId ?? ''}
+                        onChange={async (e) => {
+                          const actionId = e.target.value ? Number(e.target.value) : null;
+                          await handleActionChange(idx, false, actionId);
+                        }}
+                        style={styles.cellInput}
+                        disabled={!line.categorieId}
+                      >
+                        <option value="">Sélectionner</option>
+                        {line.actions.map((action) => (
+                          <option key={action.id} value={action.id}>
+                            {action.libelle}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    {line.actionId && (
+                      <div style={styles.hiddenSelectField}>
+                        <label style={styles.hiddenLabel}>Activité</label>
+                        <select
+                          value={line.activiteId ?? ''}
+                          onChange={(e) => {
+                            const activiteId = e.target.value ? Number(e.target.value) : null;
+                            handleActiviteChange(idx, false, activiteId);
+                          }}
+                          style={styles.cellInput}
+                        >
+                          <option value="">Sélectionner</option>
+                          {line.activites.map((activite) => (
+                            <option key={activite.id} value={activite.id}>
+                              {activite.libelle}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                    {line.activiteId && (
+                      <div style={styles.hiddenSelectField}>
+                        <label style={styles.hiddenLabel}>Nature économique</label>
+                        <select
+                          value={line.natureId ?? ''}
+                          onChange={(e) => {
+                            const natureId = e.target.value ? Number(e.target.value) : null;
+                            handleNatureChange(idx, false, natureId);
+                          }}
+                          style={styles.cellInput}
+                        >
+                          <option value="">Sélectionner</option>
+                          {natures.map((nature) => (
+                            <option key={nature.id} value={nature.id}>
+                              {nature.libelle}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                )}
               ))}
 
               <button
@@ -653,6 +935,22 @@ const styles = {
     marginTop: '12px',
     paddingTop: '12px',
     borderTop: '1px solid #ddd',
+  },
+  hiddenSelectRow: {
+    display: 'grid',
+    gridTemplateColumns: '1fr',
+    gap: '12px',
+    marginTop: '10px',
+  },
+  hiddenSelectField: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    gap: '6px',
+  },
+  hiddenLabel: {
+    fontSize: '12px',
+    fontWeight: 600 as const,
+    color: '#555',
   },
   tableHeader: {
     display: 'grid',

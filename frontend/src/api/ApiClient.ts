@@ -70,6 +70,14 @@ class ApiClient {
     return this.api.get(`/programmes/section/${sectionId}`);
   }
 
+  getCategories() {
+    return this.api.get('/categories');
+  }
+
+  getNatures() {
+    return this.api.get('/natures');
+  }
+
   // Action endpoints
   getActionsByProgramme(programmeId: number) {
     return this.api.get(`/actions/programme/${programmeId}`);
