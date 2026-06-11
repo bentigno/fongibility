@@ -1,0 +1,16 @@
+{
+  "name": "Mon Codespace avec Codeium",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Codeium.codeium"
+      ],
+      "settings": {
+        // Ouvre automatiquement le panneau de chat Codeium au démarrage
+        "codeium.openChatOnStartup": true,
+        // (Optionnel) Désactive le chat de base de VS Code pour éviter les conflits
+        "workbench.startupEditor": "none"
+      }
+    }
+  }
+}
