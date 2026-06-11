@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/programmes")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "https://fongibility.vercel.app"})
 public class ProgrammeController {
 
     @Autowired

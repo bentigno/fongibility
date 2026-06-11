@@ -48,11 +48,11 @@ public class SecurityConfig {
                 // 1. Configuration CORS absolue pour éliminer définitivement les erreurs Vercel
                 .cors(cors -> cors.configurationSource(request -> {
                     org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
-                    config.setAllowedOrigins(java.util.List.of("*")); // Autorise absolument toutes les origines
+                    config.setAllowedOrigins(java.util.List.of("http://localhost:3000", "https://fongibility.vercel.app"));
                     config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(java.util.List.of("*"));
-                    // Note : allowCredentials(true) est incompatible avec "*", on le retire ou on le commente
-                    // config.setAllowCredentials(true); 
+                    config.setAllowCredentials(true);
+                    config.setExposedHeaders(java.util.List.of("Authorization"));
                     return config;
                 }))
 
