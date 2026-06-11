@@ -7,7 +7,7 @@ import { TransactionForm } from './TransactionForm';
 export function Dashboard() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
-  const [opMode, setOpMode] = useState<'saisie' | 'consultation' | 'transmission'>('saisie');
+  const [opMode, setOpMode] = useState<'saisie' | 'consultation'>('saisie');
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -79,12 +79,6 @@ export function Dashboard() {
               >
                 Consultation - Édition
               </button>
-              <button
-                style={opMode === 'transmission' ? styles.menuBtnActive : styles.menuBtn}
-                onClick={() => setOpMode('transmission')}
-              >
-                Transmission
-              </button>
             </div>
 
             {opMode === 'saisie' && (
@@ -99,13 +93,6 @@ export function Dashboard() {
                 <h3>Consultation / Édition</h3>
                 <p>Consultez et éditez les transactions existantes ci-dessous.</p>
                 {/* Réutilise la table d'historique plus bas ou ajouter un composant d'édition */}
-              </div>
-            )}
-
-            {opMode === 'transmission' && (
-              <div>
-                <h3>Transmission</h3>
-                <p>Gérez la transmission des transactions vers l'entité suivante.</p>
               </div>
             )}
           </div>
